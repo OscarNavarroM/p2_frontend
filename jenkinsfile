@@ -1,0 +1,40 @@
+pipeline { 
+    agent any    
+    stages { 
+        stage('Construir') {  
+            steps { 
+                echo 'Prueba1'  
+            } 
+        } 
+        stage('docker imagen front') {
+            steps {
+                dir('/var/lib/jenkins/workspace/front'){
+                    sh 'docker build . -t front'
+                    sh 'docker run --name front -d -p 3000:3000 front'
+                }
+            }
+
+        }
+        stage("docker imagen back"){
+            steps {
+                dir('/var/lib/jenkins/workspace/back'){
+                    sh 'docker build . -t back'
+                    sh 'docker run --name back -d -p 9000:9000 front'
+                }
+            }
+        }
+
+        stage('DockerHub login') {
+            steps { 
+                 sh "docker login -u osnavarro123 -p Asdasdqw12"
+            }
+
+        }
+        stage('DockerHub push'){
+            steps {
+                 sh "docker tag front osnavarro123/front"
+                 sh 'docker push osnavarro123/front'
+            }
+        }
+    }
+}
